@@ -87,10 +87,10 @@ rm(blogSamp)
 rm(newsSamp)
 rm(twitSamp)
 
-write.table(allSamp, file="C:\\Modeling and Simulation\\DataScienceCapstone\\All Dsets\\Samples\\allSamples.txt", row.names = F)
+write.table(allSamp, file="C:\\Users/smsanda/Documents/en_US"\\Samples\\allSamples.txt", row.names = F)
 
 #####Create a corpus#########################################################################
-allSamp<-VCorpus(DirSource(directory="C:\\Modeling and Simulation\\DataScienceCapstone\\All Dsets\\Samples",encoding="UTF-8"),readerControl = list(language="us"))
+allSamp<-VCorpus(DirSource(directory="C:\\Users/smsanda/Documents/en_US"\\Samples",encoding="UTF-8"),readerControl = list(language="us"))
 
 ###Clean the combined file
 
