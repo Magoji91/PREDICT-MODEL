@@ -1,4 +1,4 @@
-###This script defines the DATAWORDR algorithm and function for predicting the next word in a sentence############
+###This script defines the stupid backoff algorithm and function for predicting the next word in a sentence############
 
 #Load the required libraries###
 library(data.table)
@@ -10,10 +10,10 @@ library(ggplot2)
 
 ###Stupid-Backoff# ############
 
-# the stupid back-off algorithm gives a score to the frequencies of words or n-grams and develop relative scores####
+# the stupid backoff algorithm gives a score to the frequencies of words or n-grams and develop relative scores####
 
 
-#setwd("C:/XXX")
+#setwd("C:/Users/smsanda/Documents/en_US")
 
 # read in the unigram, bigram, trigram, quadragram and pentagram files
 unigram<-fread("unigrams.csv")
