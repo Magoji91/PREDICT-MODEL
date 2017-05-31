@@ -13,34 +13,19 @@ require(stringr)
 library(tidytext)
 library(dplyr)
 library(data.table)
-setwd("C:\\Modeling and Simulation\\DataScienceCapstone\\All Dsets")
 
-####read in the datasets###############################
-fp<-("H:/Personal/Continuing Education/Data Scientist Specialization/Data Science Capstone/en_US")
+setwd("C:/Users/smsanda/Documents/en_US")
 
-####Read in the three datasets#############################################################################################
+newsData <- readLines(file("en_US.news.txt"))
+blogData <- readLines(file("en_US.blogs.txt"))
+twitterData <- readLines(file("en_US.twitter.txt"))
 
-## Because of special characters the readLines function does not read the news dataset correctly. To handle this
-## the datasets are read in using the binary mode
-
-
-conn <- file(paste(fp,"/","en_US.blogs.txt", sep=""), open = "rb")
-blogs <- readLines(conn, encoding = "UTF-8")
-close(conn)
-
-
-conn <- file(paste(fp,"/","en_US.news.txt", sep=""), open = "rb")
-news <- readLines(conn, encoding = "UTF-8")
-close(conn)
-
-
-conn <- file(paste(fp,"/","en_US.twitter.txt", sep=""), open = "rb")
-twit <- readLines(conn, encoding = "UTF-8")
-close(conn)
+print(paste("News Data Length = ", length(newsData),
+            ", News Blog Length = ", length(blogData),
+            ", News twitter Length = ", length(twitterData)
+            ))
 
 #################################################################################################################################
-
-
 
 ##A function to sample lines from a text file
 sample_files <- function(x) {
@@ -84,9 +69,6 @@ removeCharRepetition <- function(x) {
     a <- gsub("[a-z]*yyy[a-z]*", " ", a)
     gsub("[a-z]*zzz[a-z]*", " ", a)
 }
-
-
-
 
 ####GEt a sample of all the three datasets##########
 set.seed(12345)
