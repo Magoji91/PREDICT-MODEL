@@ -32,68 +32,17 @@ sample_files <- function(x) {
     x <- sample(x, length(x)*0.1)# 10% of the lines are sampled
 }
 
-####Functions to remove special characters
-detectNonAsciiChar <- function(x) iconv(x, from="UTF-8", to="ASCII",sub="X")##detects a nonASCII character and substitutesit with "X"
-removeNonAsciiWord <- function(x) gsub("[a-z]*X+[a-z]*", " ", x)##removes the detected nonASCII characters
-removeHTTPS <- function(x) gsub("https://(.*)[.][a-z]+|https://[a-z]+", " ", x)
-removeHTTP  <- function(x) gsub("http://(.*)[.][a-z]+|https://[a-z]+", " ", x)
-removeFTP <- function(x) gsub("ftp://(.*)[.][a-z]+|https://[a-z]+", " ", x)
-removeWWW <- function(x) gsub("www(.*)[.][a-z]+|www.", " ", x)
-removeHashTag <- function(x) gsub("#[a-z0-9]+", " ", x)
-removeTwitterRT <- function(x) gsub("^rt |^rt:", " ", x)
-removeCharRepetition <- function(x) {
-    a <- gsub("[a-z]*aaa[a-z]*", " ", x)
-    a <- gsub("[a-z]*bbb[a-z]*", " ", a)
-    a <- gsub("[a-z]*ccc[a-z]*", " ", a)
-    a <- gsub("[a-z]*ddd[a-z]*", " ", a)
-    a <- gsub("[a-z]*eee[a-z]*", " ", a)
-    a <- gsub("[a-z]*fff[a-z]*", " ", a)
-    a <- gsub("[a-z]*ggg[a-z]*", " ", a)
-    a <- gsub("[a-z]*hhh[a-z]*", " ", a)
-    a <- gsub("[a-z]*iii[a-z]*", " ", a)
-    a <- gsub("[a-z]*jjj[a-z]*", " ", a)
-    a <- gsub("[a-z]*kkk[a-z]*", " ", a)
-    a <- gsub("[a-z]*lll[a-z]*", " ", a)
-    a <- gsub("[a-z]*mmm[a-z]*", " ", a)
-    a <- gsub("[a-z]*nnn[a-z]*", " ", a)
-    a <- gsub("[a-z]*ooo[a-z]*", " ", a)
-    a <- gsub("[a-z]*ppp[a-z]*", " ", a)
-    a <- gsub("[a-z]*qqq[a-z]*", " ", a)
-    a <- gsub("[a-z]*rrr[a-z]*", " ", a)
-    a <- gsub("[a-z]*sss[a-z]*", " ", a)
-    a <- gsub("[a-z]*ttt[a-z]*", " ", a)
-    a <- gsub("[a-z]*uuu[a-z]*", " ", a)
-    a <- gsub("[a-z]*vvv[a-z]*", " ", a)
-    a <- gsub("[a-z]*www[a-z]*", " ", a)
-    a <- gsub("[a-z]*xxx[a-z]*", " ", a)
-    a <- gsub("[a-z]*yyy[a-z]*", " ", a)
-    gsub("[a-z]*zzz[a-z]*", " ", a)
-}
-
-####GEt a sample of all the three datasets##########
-set.seed(12345)
-blogSamp <- sample_files(blogs)#using the sample_files function defined above to sample 10% of the file
-newsSamp <- sample_files(news)
-twitSamp <- sample_files(twit)
-rm(blogs,news,twit)##removes the original datasets to free up memory
-
-bad_words<-readLines("bad-words.txt", encoding="UTF-8", skipNul = TRUE)##this is a text file for bad/offensive words
-bad_words<-bad_words[2:1384]
-
-##combine all three sampled files and remove the individual sample files
-
-allSamp<-c(blogSamp,newsSamp,twitSamp)
-rm(blogSamp)
-rm(newsSamp)
-rm(twitSamp)
-
-write.table(allSamp, file="C:\\Users/smsanda/Documents/en_US"\\Samples\\allSamples.txt", row.names = F)
-
-#####Create a corpus#########################################################################
-allSamp<-VCorpus(DirSource(directory="C:\\Users/smsanda/Documents/en_US"\\Samples",encoding="UTF-8"),readerControl = list(language="us"))
+print(paste("News Data Length = ", length(newsData),
+            ", News Blog Length = ", length(blogData),
+            ", News twitter Length = ", length(twitterData)
+            ))
+library(tm)
+## Loading required package: NLP
+#Load 5000 lines from every set in corpus
+merged <- paste(newsData[1:5000], blogData[1:5000], twitterData[1:5000])
 
 ###Clean the combined file
-
+allSamp <- VCorpus(VectorSource(merged))
 allSamp<- tm_map(allSamp, removeNumbers)
 allSamp <- tm_map(allSamp, content_transformer(tolower))
 allSamp <- tm_map(allSamp, content_transformer(detectNonAsciiChar))
@@ -108,6 +57,11 @@ allSamp<- tm_map(allSamp, content_transformer(removeCharRepetition))
 allSamp <- tm_map(allSamp, removePunctuation)
 allSamp <- tm_map(allSamp , stripWhitespace)
 allSamp <- tm_map(allSamp , removeWords,bad_words)
+
+write.table(allSamp, file="C:\\Users/smsanda/Documents/en_US"\\Samples\\allSamples.txt", row.names = F)
+
+#####Create a corpus#########################################################################
+allSamp<-VCorpus(DirSource(directory="C:\\Users/smsanda/Documents/en_US"\\Samples",encoding="UTF-8"),readerControl = list(language="us"))
 
 ####Preparing a tidy text document
 tidy_docs<-tidy(allSamp)
