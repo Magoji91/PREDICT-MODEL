@@ -59,7 +59,7 @@ shinyUI(fluidPage(
             )),
               tabPanel("Instructions",
                h1("Using the App"),
-                HTML("(1.) The app predicts the next word in a sentence/partial sentence using a DATAWORDR based algorithm <br>
+                HTML("(1.) The app predicts the next word in a sentence/partial sentence using the stupid backoffalgorithm <br>
                      (2.) To predict the next word type enter with a sentence with two or more words separated by a space <br> 
                      (3.) A table of predicted words and the algorithm used is presented in sidebar panel <br>
                      (4.) In the main panel a bar chart of the top 5 predicted words and the scores is presented along with a wordcloud of the top 100 predicted words <br>
