@@ -43,7 +43,7 @@ shinyUI(fluidPage(
                 
                 # Link to repo
                 helpText(a('Link to the GitHub Repository',
-                           href='https://github.com/arttuK/word-prediction/tree/master/shiny',
+                           href='https://github.com/Magoji91/PREDICT-MODEL,
                            target = '_blank')
                 ),
                 
