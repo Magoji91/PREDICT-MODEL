@@ -48,7 +48,7 @@ corpus <- tm_map(corpus, removeCharRepetition)
 corpus <- tm_map(corpus, stripWhitespace)
 corpus <- tm_map(corpus, removeWords,bad_words)
 
-write.table(allSamp, file="C:\\Users/smsanda/Documents/en_US"\\Samples\\allSamples.txt", row.names = F)
+write.table(corpus, file="C://Users/smsanda/Documents/en_US"/corpus.txt", row.names = F)
 
 #####Create a corpus#########################################################################
 corpus<-VCorpus(DirSource(directory="C:\\Users/smsanda/Documents/en_US"\\Samples",encoding="UTF-8"),readerControl = list(language="us"))
