@@ -1,7 +1,7 @@
 library(shiny)
 library(wordcloud)
 
-source("DATAWORD")
+source("DATAWORD.R")
 
 # Define server logic required to output a table and a barchart
 shinyServer(function(input, output) {
@@ -18,7 +18,7 @@ shinyServer(function(input, output) {
        levels<-as.character(out2$PredictedWord)
        out2$PredictedWord<-factor(out2$PredictedWord, levels=c(rev(levels)), labels=c(rev(levels)))# making a factor with character levels displayed
        p<-ggplot(data=out2, aes(x=PredictedWord, y=Score))
-       p+ geom_bar(stat="identity", fill="blue")+coord_flip()+labs(x = "Predicted Words", y = "Backoff Score")+
+       p+ geom_bar(stat="identity", fill="purple")+coord_flip()+labs(x = "Predicted Words", y = "Backoff Score")+
            theme_bw()+
            theme(plot.background = element_blank()
                  ,panel.grid.major = element_blank()
