@@ -104,6 +104,7 @@ allSamp <- tm_map(allSamp, content_transformer(removeTwitterRT))
 allSamp<- tm_map(allSamp, content_transformer(removeCharRepetition))
 allSamp <- tm_map(allSamp, removePunctuation)
 allSamp <- tm_map(allSamp , stripWhitespace)
+allSamp <- tm_map(allSamp, removeWords, stopwords("english"))
 
 
 ####Preparing a tidy text document
