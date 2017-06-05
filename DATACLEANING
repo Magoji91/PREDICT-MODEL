@@ -5,9 +5,9 @@
 
 setwd("C:/Users/smsanda/Documents/en_US")
 
-newsData <- readLines(file("en_US.news.txt"))
-blogData <- readLines(file("en_US.blogs.txt"))
-twitterData <- readLines(file("en_US.twitter.txt"))
+news <- readLines(file("en_US.news.txt"))
+blogs<- readLines(file("en_US.blogs.txt"))
+twit <- readLines(file("en_US.twitter.txt"))
 
 print(paste("News Data Length = ", length(newsData),
             ", News Blog Length = ", length(blogData),
@@ -76,9 +76,6 @@ blogSamp <- sample_files(blogs)#using the sample_files function defined above to
 newsSamp <- sample_files(news)
 twitSamp <- sample_files(twit)
 rm(blogs,news,twit)##removes the original datasets to free up memory
-
-bad_words<-readLines("bad-words.txt", encoding="UTF-8", skipNul = TRUE)##this is a text file for bad/offensive words
-bad_words<-bad_words[2:1384]
 
 ##combine all three sampled files and remove the individual sample files
 
