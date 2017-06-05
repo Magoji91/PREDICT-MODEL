@@ -105,6 +105,7 @@ allSamp<- tm_map(allSamp, content_transformer(removeCharRepetition))
 allSamp <- tm_map(allSamp, removePunctuation)
 allSamp <- tm_map(allSamp , stripWhitespace)
 allSamp <- tm_map(allSamp, removeWords, stopwords("english"))
+ allSamp <- tm_map(allSamp, stemDocument)
 
 
 ####Preparing a tidy text document
