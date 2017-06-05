@@ -84,10 +84,10 @@ rm(blogSamp)
 rm(newsSamp)
 rm(twitSamp)
 
-write.table(allSamp, file="C:\\Modeling and Simulation\\DataScienceCapstone\\All Dsets\\Samples\\allSamples.txt", row.names = F)
+write.table(allSamp, file="C:\\Users\\smsanda\\Documents\\en_US\\allSamples.txt", row.names = F)
 
 #####Create a corpus#########################################################################
-allSamp<-VCorpus(DirSource(directory="C:\\Modeling and Simulation\\DataScienceCapstone\\All Dsets\\Samples",encoding="UTF-8"),readerControl = list(language="us"))
+allSamp<-VCorpus(DirSource(directory="C:\\Users\\smsanda\\Documents\\en_US",encoding="UTF-8"),readerControl = list(language="us"))
 
 ###Clean the combined file
 
@@ -104,7 +104,7 @@ allSamp <- tm_map(allSamp, content_transformer(removeTwitterRT))
 allSamp<- tm_map(allSamp, content_transformer(removeCharRepetition))
 allSamp <- tm_map(allSamp, removePunctuation)
 allSamp <- tm_map(allSamp , stripWhitespace)
-allSamp <- tm_map(allSamp , removeWords,bad_words)
+
 
 ####Preparing a tidy text document
 tidy_docs<-tidy(allSamp)
