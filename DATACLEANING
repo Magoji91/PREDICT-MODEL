@@ -9,9 +9,9 @@ news <- readLines(file("en_US.news.txt"))
 blogs<- readLines(file("en_US.blogs.txt"))
 twit <- readLines(file("en_US.twitter.txt"))
 
-print(paste("News Data Length = ", length(newsData),
-            ", News Blog Length = ", length(blogData),
-            ", News twitter Length = ", length(twitterData)
+print(paste("News Data Length = ", length(news),
+            ", News Blog Length = ", length(blogs),
+            ", News twitter Length = ", length(twit)
             ))
             
 #Load the required libraries
@@ -70,7 +70,7 @@ removeCharRepetition <- function(x) {
 
 
 
-####GEt a sample of all the three datasets##########
+####Get a sample of all the three datasets##########
 set.seed(12345)
 blogSamp <- sample_files(blogs)#using the sample_files function defined above to sample 10% of the file
 newsSamp <- sample_files(news)
@@ -85,6 +85,8 @@ rm(newsSamp)
 rm(twitSamp)
 
 write.table(allSamp, file="C:\\Users\\smsanda\\Documents\\en_US\\allSamples.txt", row.names = F)
+
+library(tm)
 
 #####Create a corpus#########################################################################
 allSamp<-VCorpus(DirSource(directory="C:\\Users\\smsanda\\Documents\\en_US",encoding="UTF-8"),readerControl = list(language="us"))
@@ -105,74 +107,88 @@ allSamp<- tm_map(allSamp, content_transformer(removeCharRepetition))
 allSamp <- tm_map(allSamp, removePunctuation)
 allSamp <- tm_map(allSamp , stripWhitespace)
 allSamp <- tm_map(allSamp, removeWords, stopwords("english"))
- allSamp <- tm_map(allSamp, stemDocument)
+allSamp <- tm_map(allSamp, stemDocument)
 
-
-####Preparing a tidy text document
-tidy_docs<-tidy(allSamp)
-###Generating frquencies
-############uni grams##################################################
-token_uni<-tidy_docs %>% unnest_tokens(words,text)
-
-freq_uni<-token_uni %>% count(words, sort=TRUE)
-uiL<-str_split(freq_uni$words," ")
-freq_uni$start<-sapply(uiL,FUN=function(x) x[1])
-freq_uni$end<-sapply(uiL,FUN=function(x) x[1])
-
-rm(token_uni, uiL)
-
-
-######################bi grams#####################################################################################
-token_bi<-tidy_docs %>% unnest_tokens(bigram,text,token="ngrams", n=2)
-
-freq_bi<-token_bi %>% count(bigram, sort=TRUE)
-biL<-str_split(freq_bi$bigram," ")
-freq_bi$start<-sapply(biL,FUN=function(x) x[1])
-freq_bi$end<-sapply(biL,FUN=function(x) x[2])
-
-rm(token_bi, biL)
-
-######################tri grams#####################################################################################
-token_tri<-tidy_docs %>% unnest_tokens(trigram,text,token="ngrams", n=3)
-
-freq_tri<-token_tri %>% count(trigram, sort=TRUE)
-triL<-str_split(freq_tri$trigram," ")
-freq_tri$start<-sapply(triL,FUN=function(x) paste(x[1],x[2]))
-freq_tri$end<-sapply(triL,FUN=function(x) x[3])
-
-rm(token_tri, triL)
-
-######################quadra grams#####################################################################################
-token_quadi<-tidy_docs %>% unnest_tokens(quadragram,text,token="ngrams", n=4)
-
-freq_quadi<-token_quadi %>% count(quadragram, sort=TRUE)
-quadiL<-str_split(freq_quadi$quadragram," ")
-freq_quadi$start<-sapply(quadiL,FUN=function(x) paste(x[1],x[2],x[3]))
-freq_quadi$end<-sapply(quadiL,FUN=function(x) x[4])
-
-rm(token_quadi, quadiL)
-
-######################penta grams#####################################################################################
-token_penta<-tidy_docs %>% unnest_tokens(pentagram,text,token="ngrams", n=5)
-
-freq_penta<-token_penta %>% count(pentagram, sort=TRUE)
-pentaL<-str_split(freq_penta$pentagram," ")
-freq_penta$start<-sapply(pentaL,FUN=function(x) paste(x[1],x[2],x[3],x[4]))
-freq_penta$end<-sapply(pentaL,FUN=function(x) x[5])
-
-rm(token_penta, pentaL)
+##Load list of profanity
+badWordsURL<-"https://raw.githubusercontent.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en"
+download.file(badWordsURL,destfile="badWords.txt")
+badWords<-read.csv("badWords.txt",header=FALSE,sep="\n",strip.white=TRUE)
+allSamp<-tm_map(allSamp,removeWords,badWords[,1])
 
 
 
+#Word/phrase count function
+freqDataFrame <- function(tdm){
+  # Helper function to tabulate frequency
+  freq <- sort(rowSums(as.matrix(tdm)), decreasing=TRUE)
+  freqDataFrame <- data.frame(word=names(freq), freq=freq)
+  return(freqDataFrame)
+}
 
-rm(allSamp)
 
-########################################################################################################################
-##Clean up lower frequency terms to reduce size of datasets####################################################################################
-freq_bi<-subset(freq_bi, freq_bi$n>=2)
-freq_tri<-subset(freq_tri, freq_tri$n>=2)
-freq_quadi<-subset(freq_quadi, freq_quadi$n>=2)
-freq_penta<-subset(freq_penta, freq_penta$n>=2)
+#n-gram Functions
+library(RWeka)
+library(ggplot2)
+singleFunc<-function(x) unlist(lapply(ngrams(words(x), 1), paste, collapse = " "), use.names = FALSE)
+biFunc<-  function(x) unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)
+triFunc<-  function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = " "), use.names = FALSE)
+quadFunc<-  function(x) unlist(lapply(ngrams(words(x), 4), paste, collapse = " "), use.names = FALSE)
+
+
+#Constructing the nGrams
+singles<- TermDocumentMatrix(allSamp, control=list(tokenize=singleFunc))
+singles <- removeSparseTerms(singles, 0.99)
+singlefreq <- freqDataFrame(singles)
+
+
+#single words
+singlefreq$word <- factor(singlefreq$word, levels = singlefreq$word[order(-singlefreq$freq)])
+g <- ggplot(subset(singlefreq,freq>20000), aes(word, freq))    
+g <- g + geom_bar(stat="identity", fill="navy")
+g <- g + xlab("Words")+ylab("Frequency")
+g <- g + theme(axis.text.x=element_text(angle=45, hjust=1))   
+g <- g + ggtitle("Plot of Most Frequent Words.")
+g 
+
+#bigrams
+biGram<- TermDocumentMatrix(allSamp, control=list(tokenize=biFunc))
+biGram <- removeSparseTerms(biGram, 0.999)
+biGramfreq <- freqDataFrame(biGram)
+
+biGramfreq$word <- factor(biGramfreq$word, levels = biGramfreq$word[order(-biGramfreq$freq)])
+g <- ggplot(subset(biGramfreq,freq>1000), aes(word, freq))    
+g <- g + geom_bar(stat="identity", fill="orange2")
+g <- g + xlab("Bigrams")+ylab("Frequency")
+g <- g + theme(axis.text.x=element_text(angle=45, hjust=1))   
+g <- g + ggtitle("Plot of Most Frequent Bigrams.")
+g 
+
+#trigrams
+triGram<- TermDocumentMatrix(allSamp, control=list(tokenize=triFunc))
+triGram <- removeSparseTerms(triGram, 0.999)
+triGramfreq <- freqDataFrame(triGram)
+
+triGramfreq$word <- factor(triGramfreq$word, levels = triGramfreq$word[order(-triGramfreq$freq)])
+g <- ggplot(triGramfreq, aes(word, freq))    
+g <- g + geom_bar(stat="identity", fill="green4")
+g <- g + xlab("Trigrams")+ylab("Frequency")
+g <- g + theme(axis.text.x=element_text(angle=45, hjust=1))   
+g <- g + ggtitle("Plot of Most Frequent Trigrams.")
+g 
+
+#quadgrams
+quadGram<- TermDocumentMatrix(allSamp, control=list(tokenize=quadFunc))
+quadGram <- removeSparseTerms(quadGram, 0.9999)
+quadGramfreq <- freqDataFrame(quadGram)
+
+quadGramfreq$word <- factor(quadGramfreq$word, levels = quadGramfreq$word[order(-quadGramfreq$freq)])
+g <- ggplot(subset(quadGramfreq,freq>40), aes(word, freq))       
+g <- g + geom_bar(stat="identity", fill="firebrick4")
+g <- g + xlab("Quadgrams")+ylab("Frequency")
+g <- g + theme(axis.text.x=element_text(angle=45, hjust=1))   
+g <- g + ggtitle("Plot of Most Frequent Quadgrams.")
+g 
+
 
 ########################Write the frequency datasets to file; to be used later for app upload#########################
 
