@@ -133,62 +133,39 @@ singleFunc<-function(x) unlist(lapply(ngrams(words(x), 1), paste, collapse = " "
 biFunc<-  function(x) unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)
 triFunc<-  function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = " "), use.names = FALSE)
 quadFunc<-  function(x) unlist(lapply(ngrams(words(x), 4), paste, collapse = " "), use.names = FALSE)
+pentaFunc<-  function(x) unlist(lapply(ngrams(words(x), 5), paste, collapse = " "), use.names = FALSE)
 
 
 #Constructing the nGrams
-singles<- TermDocumentMatrix(allSamp, control=list(tokenize=singleFunc))
-singles <- removeSparseTerms(singles, 0.99)
-singlefreq <- freqDataFrame(singles)
-
-
-#single words
-singlefreq$word <- factor(singlefreq$word, levels = singlefreq$word[order(-singlefreq$freq)])
-g <- ggplot(subset(singlefreq,freq>20000), aes(word, freq))    
-g <- g + geom_bar(stat="identity", fill="navy")
-g <- g + xlab("Words")+ylab("Frequency")
-g <- g + theme(axis.text.x=element_text(angle=45, hjust=1))   
-g <- g + ggtitle("Plot of Most Frequent Words.")
-g 
+#unigram words
+unigram<- TermDocumentMatrix(allSamp, control=list(tokenize=unigramFunc))
+unigram <- removeSparseTerms(unigram, 0.99)
+unigramfreq <- freqDataFrame(unigram)
+unigramfreq$word <- factor(unigramfreq$word, levels = unigramfreq$word[order(-unigramfreq$freq)])
 
 #bigrams
-biGram<- TermDocumentMatrix(allSamp, control=list(tokenize=biFunc))
-biGram <- removeSparseTerms(biGram, 0.999)
-biGramfreq <- freqDataFrame(biGram)
-
-biGramfreq$word <- factor(biGramfreq$word, levels = biGramfreq$word[order(-biGramfreq$freq)])
-g <- ggplot(subset(biGramfreq,freq>1000), aes(word, freq))    
-g <- g + geom_bar(stat="identity", fill="orange2")
-g <- g + xlab("Bigrams")+ylab("Frequency")
-g <- g + theme(axis.text.x=element_text(angle=45, hjust=1))   
-g <- g + ggtitle("Plot of Most Frequent Bigrams.")
-g 
+bigram<- TermDocumentMatrix(allSamp, control=list(tokenize=biFunc))
+bigram <- removeSparseTerms(bigram, 0.999)
+bigramfreq <- freqDataFrame(bigram)
+bigramfreq$word <- factor(bigramfreq$word, levels = biGramfreq$word[order(-bigramfreq$freq)])
 
 #trigrams
-triGram<- TermDocumentMatrix(allSamp, control=list(tokenize=triFunc))
-triGram <- removeSparseTerms(triGram, 0.999)
-triGramfreq <- freqDataFrame(triGram)
-
-triGramfreq$word <- factor(triGramfreq$word, levels = triGramfreq$word[order(-triGramfreq$freq)])
-g <- ggplot(triGramfreq, aes(word, freq))    
-g <- g + geom_bar(stat="identity", fill="green4")
-g <- g + xlab("Trigrams")+ylab("Frequency")
-g <- g + theme(axis.text.x=element_text(angle=45, hjust=1))   
-g <- g + ggtitle("Plot of Most Frequent Trigrams.")
-g 
+trigram<- TermDocumentMatrix(allSamp, control=list(tokenize=triFunc))
+trigram <- removeSparseTerms(trigram, 0.999)
+trigramfreq <- freqDataFrame(trigram)
+trigramfreq$word <- factor(trigramfreq$word, levels = trigramfreq$word[order(-trigramfreq$freq)])
 
 #quadgrams
-quadGram<- TermDocumentMatrix(allSamp, control=list(tokenize=quadFunc))
-quadGram <- removeSparseTerms(quadGram, 0.9999)
-quadGramfreq <- freqDataFrame(quadGram)
+quadgram<- TermDocumentMatrix(allSamp, control=list(tokenize=quadFunc))
+quadgram <- removeSparseTerms(quadgram, 0.9999)
+quadgramfreq <- freqDataFrame(quadgram)
+quadgramfreq$word <- factor(quadgramfreq$word, levels = quadgramfreq$word[order(-quadgramfreq$freq)])
 
-quadGramfreq$word <- factor(quadGramfreq$word, levels = quadGramfreq$word[order(-quadGramfreq$freq)])
-g <- ggplot(subset(quadGramfreq,freq>40), aes(word, freq))       
-g <- g + geom_bar(stat="identity", fill="firebrick4")
-g <- g + xlab("Quadgrams")+ylab("Frequency")
-g <- g + theme(axis.text.x=element_text(angle=45, hjust=1))   
-g <- g + ggtitle("Plot of Most Frequent Quadgrams.")
-g 
-
+#pentagrams
+pentagram<- TermDocumentMatrix(allSamp, control=list(tokenize=pentaFunc))
+pentagram <- removeSparseTerms(pentagram, 0.9999)
+pentagramfreq <- freqDataFrame(pentagram)
+pentagramfreq$word <- factor(pentagramfreq$word, levels = quadgramfreq$word[order(-quadgramfreq$freq)])
 
 ########################Write the frequency datasets to file; to be used later for app upload#########################
 
