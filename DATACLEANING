@@ -139,19 +139,19 @@ pentagramFunc<-  function(x) unlist(lapply(ngrams(words(x), 5), paste, collapse 
 #Constructing the nGrams
 #unigram words
 unigram<- TermDocumentMatrix(allSamp, control=list(tokenize=unigramFunc))
-unigram <- removeSparseTerms(unigram, 0.99)
+unigram <- removeSparseTerms(unigram, 0.9999)
 unigramfreq <- freqDataFrame(unigram)
 unigramfreq$word <- factor(unigramfreq$word, levels = unigramfreq$word[order(-unigramfreq$freq)])
 
 #bigrams
 bigram<- TermDocumentMatrix(allSamp, control=list(tokenize=biFunc))
-bigram <- removeSparseTerms(bigram, 0.999)
+bigram <- removeSparseTerms(bigram, 0.9999)
 bigramfreq <- freqDataFrame(bigram)
 bigramfreq$word <- factor(bigramfreq$word, levels = biGramfreq$word[order(-bigramfreq$freq)])
 
 #trigrams
 trigram<- TermDocumentMatrix(allSamp, control=list(tokenize=triFunc))
-trigram <- removeSparseTerms(trigram, 0.999)
+trigram <- removeSparseTerms(trigram, 0.9999)
 trigramfreq <- freqDataFrame(trigram)
 trigramfreq$word <- factor(trigramfreq$word, levels = trigramfreq$word[order(-trigramfreq$freq)])
 
