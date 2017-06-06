@@ -135,42 +135,18 @@ trigramFunc<-  function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = 
 quadgramFunc<-  function(x) unlist(lapply(ngrams(words(x), 4), paste, collapse = " "), use.names = FALSE)
 pentagramFunc<-  function(x) unlist(lapply(ngrams(words(x), 5), paste, collapse = " "), use.names = FALSE)
 
-
 #Constructing the nGrams
-#unigram words
-unigram<- TermDocumentMatrix(allSamp, control=list(tokenize=unigramFunc))
-unigram <- removeSparseTerms(unigram, 0.9999)
-unigramfreq <- freqDataFrame(unigram)
-unigramfreq$word <- factor(unigramfreq$word, levels = unigramfreq$word[order(-unigramfreq$freq)])
+unigramFunc = function(x) NGramTokenizer(x, Weka_control(min = 1, max = 1))
+bigramFunc = function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2))
+trigramFunc = function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3))
+quadgramFunc = function(x) NGramTokenizer(x, Weka_control(min = 4, max = 4))
+pentagramFunc = function(x) NGramTokenizer(x, Weka_control(min = 5, max = 5))
 
-#bigrams
-bigram<- TermDocumentMatrix(allSamp, control=list(tokenize=biFunc))
-bigram <- removeSparseTerms(bigram, 0.9999)
-bigramfreq <- freqDataFrame(bigram)
-bigramfreq$word <- factor(bigramfreq$word, levels = biGramfreq$word[order(-bigramfreq$freq)])
-
-#trigrams
-trigram<- TermDocumentMatrix(allSamp, control=list(tokenize=triFunc))
-trigram <- removeSparseTerms(trigram, 0.9999)
-trigramfreq <- freqDataFrame(trigram)
-trigramfreq$word <- factor(trigramfreq$word, levels = trigramfreq$word[order(-trigramfreq$freq)])
-
-#quadgrams
-quadgram<- TermDocumentMatrix(allSamp, control=list(tokenize=quadFunc))
-quadgram <- removeSparseTerms(quadgram, 0.9999)
-quadgramfreq <- freqDataFrame(quadgram)
-quadgramfreq$word <- factor(quadgramfreq$word, levels = quadgramfreq$word[order(-quadgramfreq$freq)])
-
-#pentagrams
-pentagram<- TermDocumentMatrix(allSamp, control=list(tokenize=pentaFunc))
-pentagram <- removeSparseTerms(pentagram, 0.9999)
-pentagramfreq <- freqDataFrame(pentagram)
-pentagramfreq$word <- factor(pentagramfreq$word, levels = quadgramfreq$word[order(-quadgramfreq$freq)])
 
 ########################Write the frequency datasets to file; to be used later for app upload#########################
 
-write.csv(freq_uni, file="unigrams.csv", row.names = F)
-write.csv(freq_bi, file="bigrams.csv", row.names = F)
-write.csv(freq_tri, file="trigrams.csv", row.names = F)
-write.csv(freq_quadi, file="quadragrams.csv", row.names = F)
-write.csv(freq_penta, file="pentagrams.csv", row.names = F)
+write.csv(unigramFunc, file="unigrams.csv", row.names = F)
+write.csv(bigramFunc, file="bigrams.csv", row.names = F)
+write.csv(trigramFunc, file="trigrams.csv", row.names = F)
+write.csv(quadgramFunc, file="quadragrams.csv", row.names = F)
+write.csv(pentagramFunc, file="pentagrams.csv", row.names = F)
