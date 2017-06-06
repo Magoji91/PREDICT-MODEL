@@ -115,28 +115,33 @@ download.file(badWordsURL,destfile="badWords.txt")
 badWords<-read.csv("badWords.txt",header=FALSE,sep="\n",strip.white=TRUE)
 allSamp<-tm_map(allSamp,removeWords,badWords[,1])
 
+# Convert data to plain text
+textCorpus <- tm_map(textCorpus, PlainTextDocument)
+
+#Word/phrase count function
+freqDataFrame <- function(tdm){
+  # Helper function to tabulate frequency
+  freq <- sort(rowSums(as.matrix(tdm)), decreasing=TRUE)
+  freqDataFrame <- data.frame(word=names(freq), freq=freq)
+  return(freqDataFrame)
+}
 
 
-#Term-document matrix
 #n-gram Functions
 library(RWeka)
-library(ggplot2)
+singleFunc<-function(x) unlist(lapply(ngrams(words(x), 1), paste, collapse = " "), use.names = FALSE)
+biFunc<-  function(x) unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)
+triFunc<-  function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = " "), use.names = FALSE)
+quadFunc<-  function(x) unlist(lapply(ngrams(words(x), 4), paste, collapse = " "), use.names = FALSE)
 
-allSamp.tdm <- TermDocumentMatrix(allSamp)
-allSamp.tdm
 
 #Constructing the nGrams
-unigramFunc = function(x) NGramTokenizer(x, Weka_control(min = 1, max = 1))
-bigramFunc = function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2))
-trigramFunc = function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3))
-quadgramFunc = function(x) NGramTokenizer(x, Weka_control(min = 4, max = 4))
-pentagramFunc = function(x) NGramTokenizer(x, Weka_control(min = 5, max = 5))
+singles<- TermDocumentMatrix(allSamp, control=list(tokenize=singleFunc))
+singles <- removeSparseTerms(singles, 0.99)
+singlefreq <- freqDataFrame(singles)
+singlefreq$word <- factor(singlefreq$word, levels = singlefreq$word[order(-singlefreq$freq)])
 
-tdm_t1 <- TermDocumentMatrix(corpus, control = list(tokenize = unigramTokenizer))
-tdm_t2 <- TermDocumentMatrix(corpus, control = list(tokenize = bigramTokenizer)) 
-tdm_t3 <- TermDocumentMatrix(corpus, control = list(tokenize = trigramTokenizer))
-tdm_t4 <- TermDocumentMatrix(corpus, control = list(tokenize = quadrgamTokenizer))
-tdm_t5 <- TermDocumentMatrix(corpus, control = list(tokenize = pentagramTokenizer))
+
 
 
 
