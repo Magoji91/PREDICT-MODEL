@@ -117,23 +117,13 @@ allSamp<-tm_map(allSamp,removeWords,badWords[,1])
 
 
 
-#Word/phrase count function
-freqDataFrame <- function(tdm){
-  # Helper function to tabulate frequency
-  freq <- sort(rowSums(as.matrix(tdm)), decreasing=TRUE)
-  freqDataFrame <- data.frame(word=names(freq), freq=freq)
-  return(freqDataFrame)
-}
-
-
+#Term-document matrix
 #n-gram Functions
 library(RWeka)
 library(ggplot2)
-unigramFunc<-function(x) unlist(lapply(ngrams(words(x), 1), paste, collapse = " "), use.names = FALSE)
-bigramFunc<-  function(x) unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)
-trigramFunc<-  function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = " "), use.names = FALSE)
-quadgramFunc<-  function(x) unlist(lapply(ngrams(words(x), 4), paste, collapse = " "), use.names = FALSE)
-pentagramFunc<-  function(x) unlist(lapply(ngrams(words(x), 5), paste, collapse = " "), use.names = FALSE)
+
+allSamp.tdm <- TermDocumentMatrix(allSamp)
+allSamp.tdm
 
 #Constructing the nGrams
 unigramFunc = function(x) NGramTokenizer(x, Weka_control(min = 1, max = 1))
@@ -141,6 +131,13 @@ bigramFunc = function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2))
 trigramFunc = function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3))
 quadgramFunc = function(x) NGramTokenizer(x, Weka_control(min = 4, max = 4))
 pentagramFunc = function(x) NGramTokenizer(x, Weka_control(min = 5, max = 5))
+
+tdm_t1 <- TermDocumentMatrix(corpus, control = list(tokenize = unigramTokenizer))
+tdm_t2 <- TermDocumentMatrix(corpus, control = list(tokenize = bigramTokenizer)) 
+tdm_t3 <- TermDocumentMatrix(corpus, control = list(tokenize = trigramTokenizer))
+tdm_t4 <- TermDocumentMatrix(corpus, control = list(tokenize = quadrgamTokenizer))
+tdm_t5 <- TermDocumentMatrix(corpus, control = list(tokenize = pentagramTokenizer))
+
 
 
 ########################Write the frequency datasets to file; to be used later for app upload#########################
