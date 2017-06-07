@@ -116,7 +116,7 @@ badWords<-read.csv("badWords.txt",header=FALSE,sep="\n",strip.white=TRUE)
 allSamp<-tm_map(allSamp,removeWords,badWords[,1])
 
 # Convert data to plain text
-textCorpus <- tm_map(textCorpus, PlainTextDocument)
+allSamp <- tm_map(allSamp, PlainTextDocument)
 
 #Word/phrase count function
 freqDataFrame <- function(tdm){
