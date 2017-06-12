@@ -1,0 +1,122 @@
+library(shiny)
+library(shinythemes)
+library(wordcloud)
+
+# Define the app ####
+
+ui <- shinyUI(fluidPage(
+  
+  # Theme
+  theme = shinytheme("spacelab"),
+  
+  # Application title
+  titlePanel("Word Premonitor"),
+  
+  sidebarPanel(
+    
+    # Text input
+    textInput("text", label = ('Please enter a partial sentence ideally two words or more separated by a space'), value = 'the default value'),
+    
+    # Submit button for making the prediction
+    submitButton("Submit"),
+    
+    hr(),
+    # Table output
+    dataTableOutput('table')),
+  
+  # Mainpanel ####
+  
+  mainPanel(
+    tabsetPanel(type = "tabs", 
+                tabPanel("Predictions",
+                         
+                         wellPanel(
+                           
+                           # Link to report
+                           helpText(a('More information on the project',
+                                      href='http://rpubs.com/MAGOJI/283553', 
+                                      target = '_blank')
+                           ),
+                           
+                           # Link to repo
+                           helpText(a('Link to the GitHub Repository',
+                                      href='https://github.com/Magoji91/APP-DE-PREDI-O',
+                                      target = '_blank')
+                           ),
+                           
+                           
+                           # Barchart output
+                           h2("Top 5 Predicted Words"),
+                           plotOutput("barchart"),
+                           
+                           
+                           h2("Wordcloud for the Predicted Words"),
+                           plotOutput('wordcloud')
+                           
+                         )),
+                tabPanel("Instructions",
+                         h1("Using the App"),
+                         HTML("(1.) The application uses an algorithm based on the stupid backoff in order to predict the sequential word in a given sentence or sentence <br>
+                              (2.) To predict use of the application simply write a partial sentence of 2 or more words separated by a space and click on the option send <br> 
+                              (3.) A table with the possible predicted words and the punctuation of the backoff algorithm will appear in the sidebar <br>
+                              (4.)  The main panel will show a bar chart of the 5 words with the highest possible incidence, as well as the 100 main words predicted in a wordcloud <br>
+                              (5.) For details of the App project please click on the hyperlinks in the word prediction tab <br>
+                              "))
+                
+                
+                
+                         ) )
+    ))
+
+
+# Define application ####
+
+source("MODEL.R")
+
+server <- shinyServer(function(input, output) {
+  
+  output$table<-renderDataTable({
+    par_sen<-input$text
+    out<-predict_word(partial_sentence=par_sen)
+    out})
+  
+  output$barchart <- renderPlot({
+    par_sen<-input$text
+    out<-predict_word(partial_sentence=par_sen)
+    ifelse(nrow(out>=5), out2<-out[1:5,], out2<-out)
+    levels<-as.character(out2$PredictedWord)
+    out2$PredictedWord<-factor(out2$PredictedWord, levels=c(rev(levels)), labels=c(rev(levels)))# making a factor with character levels displayed
+    p<-ggplot(data=out2, aes(x=PredictedWord, y=Score))
+    p+ geom_bar(stat="identity", fill="blue")+coord_flip()+labs(x = "Predicted Words", y = "Backoff Score")+
+      theme_bw()+
+      theme(plot.background = element_blank()
+            ,panel.grid.major = element_blank()
+            ,panel.grid.minor = element_blank()
+            ,panel.border = element_blank()
+      )+
+      theme(axis.line.x = element_line(color="black", size = 1),
+            axis.line.y = element_line(color="black", size = 1),
+            axis.title.x= element_text(face="bold",size=16),
+            axis.title.y= element_text(face="bold",size=16),
+            axis.text.x =element_text(face="bold",size=16),
+            axis.text.y =element_text(face="bold",size=16),
+            legend.position = "none") 
+    
+  })
+  
+  wordcloud_rep <- repeatable(wordcloud)
+  
+  output$wordcloud <- renderPlot({
+    par_sen<-input$text
+    out<-predict_word(partial_sentence=par_sen)
+    out$Score<-as.numeric(as.character(out$Score))
+    out$PredictedWord<-as.character(out$PredictedWord)
+    wordcloud_rep(words=out$PredictedWord, freq=out$Score,scale=c(8,2),
+                  colors=brewer.pal(8, "Dark2"), max.words=100)
+  })
+  
+})
+
+
+# Run the application 
+shinyApp(ui = ui, server = server)
